@@ -1,0 +1,80 @@
+import * as ReactApollo from 'react-apollo';
+import * as React from 'react';
+
+{{#unless @root.config.noGraphqlTag}}
+import gql from 'graphql-tag';
+{{/unless}}
+
+{{#each fragments}}
+{{#unless @root.config.noNamespaces}}
+export namespace {{toPascalCase name}} {
+{{/unless}}
+    export const {{#if @root.config.noNamespaces}}{{ toPascalCase name }}{{/if}}Document = {{#unless @root.config.noGraphqlTag}}gql`{{{ document }}}`{{else}}{{{ gql document }}}{{/unless}};
+{{#unless @root.config.noNamespaces}}
+}
+{{/unless}}
+{{/each}}
+
+{{#each operations }}
+    {{#unless @root.config.noNamespaces}}
+export namespace {{toPascalCase name}} {
+    {{/unless}}
+    export const {{#if @root.config.noNamespaces}}{{ toPascalCase name }}{{/if}}Document = {{#unless @root.config.noGraphqlTag}}gql`{{{ document }}}`{{else}}{{{ gql document }}}{{/unless}};
+    export const {{#if @root.config.noNamespaces}}{{ toPascalCase name }}{{/if}}DocumentWithFragments = {
+        kind: 'Document',
+        definitions: [
+        ...{{#if @root.config.noNamespaces}}{{ toPascalCase name }}{{/if}}Document.definitions,
+        {{#each innerModels}}
+            {{#if hasFragmentsSpread}}
+                {{#each fragmentsSpread}}
+        ...{{ toPascalCase fragmentName }}{{#unless @root.config.noNamespaces}}.{{/unless}}Document.definitions
+                {{/each}}
+            {{/if}}
+        {{/each}}
+        ]
+    };
+    {{#isQuery operationType}}
+    type OperationProps = ReactApollo.QueryProps<{{#if @root.config.noNamespaces}}{{ toPascalCase name }}{{/if}}{{toPascalCase operationType}}, {{#if @root.config.noNamespaces}}{{ toPascalCase name }}{{/if}}Variables>;
+    {{/isQuery}}
+    {{#isMutation operationType}}
+    type OperationProps = ReactApollo.MutationProps<{{#if @root.config.noNamespaces}}{{ toPascalCase name }}{{/if}}{{toPascalCase operationType}}, {{#if @root.config.noNamespaces}}{{ toPascalCase name }}{{/if}}Variables>;
+    {{/isMutation}}
+    export interface {{#if @root.config.noNamespaces}}{{ toPascalCase name }}{{/if}}ComponentProps {
+        {{ toLowerCase operationType }}?: any;
+        {{#isQuery operationType}}
+        fetchPolicy?: OperationProps['fetchPolicy'];
+        errorPolicy?: OperationProps['errorPolicy'];
+        notifyOnNetworkStatusChange?: OperationProps['notifyOnNetworkStatusChange'];
+        pollInterval?: OperationProps['pollInterval'];
+        ssr?: OperationProps['ssr'];
+        displayName?: OperationProps['displayName'];
+        skip?: OperationProps['skip'];
+        {{/isQuery}}
+        {{#isMutation operationType}}
+        ignoreResults?: OperationProps['ignoreResults'];
+        optimisticResponse?: OperationProps['optimisticResponse'];
+        refetchQueries?: OperationProps['refetchQueries'];
+        awaitRefetchQueries?: OperationProps['awaitRefetchQueries'];
+        update?: OperationProps['update'];
+        {{/isMutation}}
+        onCompleted?: OperationProps['onCompleted'];
+        onError?: OperationProps['onError'];
+        client?: OperationProps['client'];
+        context?: OperationProps['context'];
+        variables?: {{#if @root.config.noNamespaces}}{{ toPascalCase name }}{{/if}}Variables;
+        children: OperationProps['children'];
+    };
+    export class {{#if @root.config.noNamespaces}}{{ toPascalCase name }}{{/if}}Component extends React.Component<{{#if @root.config.noNamespaces}}{{ toPascalCase name }}{{/if}}ComponentProps> {
+        render(){
+            return (
+                <ReactApollo.{{ toPascalCase operationType }}<{{#if @root.config.noNamespaces}}{{ toPascalCase name }}{{/if}}{{toPascalCase operationType}}, {{#if @root.config.noNamespaces}}{{ toPascalCase name }}{{/if}}Variables>
+                {{ toLowerCase operationType }}={ {{#if @root.config.noNamespaces}}{{ toPascalCase name }}{{/if}}DocumentWithFragments }
+                {...this.props}
+                />
+            );
+        }
+    }
+    {{#unless @root.config.noNamespaces}}
+}
+    {{/unless}}
+{{/each}}

@@ -1,0 +1,34 @@
+{
+  "name": "@bodetree/gql-codegen-template",
+  "version": "0.0.1",
+  "description": "",
+  "license": "MIT",
+  "main": "./dist/index.js",
+  "typings": "dist/index.d.ts",
+  "scripts": {
+    "prepare": "yarn build",
+    "build": "codegen-templates-scripts build",
+    "pretest": "yarn build",
+    "test": "codegen-templates-scripts test"
+  },
+  "files": [
+    "dist"
+  ],
+  "dependencies": {
+    "graphql-codegen-typescript-template": "^0.11.0",
+    "graphql-tag": "^2.9.2"
+  },
+  "devDependencies": {
+    "@types/graphql": "^0.13.4",
+    "awesome-typescript-loader": "^5.2.0",
+    "codegen-templates-scripts": "^0.11.0",
+    "graphql": "^0.13.2",
+    "graphql-codegen-compiler": "^0.11.0",
+    "graphql-codegen-core": "^0.11.0",
+    "raw-loader": "^0.5.1",
+    "rimraf": "^2.6.2",
+    "typescript": "^3.0.3",
+    "webpack": "^4.17.2",
+    "webpack-node-externals": "^1.7.2"
+  }
+}
